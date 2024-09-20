@@ -18,10 +18,9 @@
     }
 
     browser.runtime.onMessage.addListener((message) => {
+        document.removeEventListener("click", handleClick, { capture: true });
         if (message === "start") {
             document.addEventListener("click", handleClick, { capture: true });
-        } else if (message === "stop") {
-            document.removeEventListener("click", handleClick, { capture: true });
         }
     });
 })();

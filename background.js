@@ -19,28 +19,14 @@ if (browser.action === undefined) {
 
 let isEnabled = false;
 
-function forEveryTabSilent(callback) {
-    browser.tabs.query({}).then((tabs) => {
-        for (const tab of tabs) {
-            callback(tab).catch(() => {});
-        }
-    });
-}
-
 browserAction.onClicked.addListener(() => {
     isEnabled = !isEnabled;
 
     const iconPath = isEnabled ? "pin_128_128.png" : "pin_128_128_crossed.png";
 
     browserAction.setIcon({ path: iconPath });
+});
 
-    if (isEnabled) {
-        forEveryTabSilent(async (tab) => {
-            await browser.tabs.sendMessage(tab.id, "start");
-        });
-    } else {
-        forEveryTabSilent(async (tab) => {
-            await browser.tabs.sendMessage(tab.id, "stop");
-        });
-    }
+browser.tabs.onActivated.addListener(() => {
+    browser.tabs.sendMessage(tab.id, isEnabled ? "start" : "stop");
 });
