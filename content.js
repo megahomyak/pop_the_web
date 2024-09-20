@@ -14,11 +14,11 @@
         if (isEnabled) {
             event.preventDefault();
             event.stopImmediatePropagation();
-            const audioBufferSource = audioContext.createBufferSource();
-            audioBufferSource.buffer = popAudioBuffer;
-            audioBufferSource.connect(audioContext.destination);
-            audioBufferSource.start();
             if (event.target.remove) {
+                const audioBufferSource = audioContext.createBufferSource();
+                audioBufferSource.buffer = popAudioBuffer;
+                audioBufferSource.connect(audioContext.destination);
+                audioBufferSource.start();
                 event.target.remove();
             }
         }
