@@ -14,7 +14,7 @@
         if (isEnabled) {
             event.preventDefault();
             event.stopImmediatePropagation();
-            if (event.target.remove) {
+            if (event.target.remove !== undefined) {
                 const audioBufferSource = audioContext.createBufferSource();
                 audioBufferSource.buffer = popAudioBuffer;
                 audioBufferSource.connect(audioContext.destination);
