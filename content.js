@@ -8,23 +8,25 @@
         ).arrayBuffer()
     );
 
-    function handleClick(event) {
-        const audioBufferSource = audioContext.createBufferSource();
-        audioBufferSource.buffer = popAudioBuffer;
-        audioBufferSource.connect(audioContext.destination);
-        audioBufferSource.start();
-        event.target.remove();
-        event.preventDefault();
-    }
+    let isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
+
+    document.addEventListener("pointerdown", (event) => {
+        if (isEnabled) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            const audioBufferSource = audioContext.createBufferSource();
+            audioBufferSource.buffer = popAudioBuffer;
+            audioBufferSource.connect(audioContext.destination);
+            audioBufferSource.start();
+            if (event.target.remove) {
+                event.target.remove();
+            }
+        }
+    }, { capture: true });
 
     browser.runtime.onMessage.addListener((message) => {
-        if (message === "stop" || message === "start") {
-            document.removeEventListener("click", handleClick, { capture: true });
-        }
-        if (message === "start") {
-            document.addEventListener("click", handleClick, { capture: true });
+        if (message.type === "setIsEnabled") {
+            isEnabled = message.value;
         }
     });
-
-    browser.runtime.sendMessage("newTab").catch(() => { });
 })();
