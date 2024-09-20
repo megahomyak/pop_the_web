@@ -2,7 +2,7 @@ This extension allows you to pop elements on webpages with a balloon popping sou
 
 # Demo
 
-The demo served by GitHub (they don't support in-repo attachments yet):
+The demo served by GitHub (they don't support in-repo attachments yet; **THERE ARE POPPING SOUNDS IN THE DEMO, DON'T FORGET TO UNMUTE THE DEMO**):
 
 https://github.com/user-attachments/assets/df141f31-c962-4aeb-9790-acaa551e898f
 
