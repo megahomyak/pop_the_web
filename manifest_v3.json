@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "version": "1",
+    "name": "Pop the web",
+    "action": {
+        "default_icon": {
+            "128": "pin_128_128_crossed.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": ["pop.mp3"],
+            "matches": ["<all_urls>"]
+        }
+    ]
+}
