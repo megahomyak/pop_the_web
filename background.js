@@ -27,6 +27,16 @@ browserAction.onClicked.addListener(() => {
     browserAction.setIcon({ path: iconPath });
 });
 
-browser.tabs.onActivated.addListener(() => {
-    browser.tabs.sendMessage(tab.id, isEnabled ? "start" : "stop");
+function notifyTab(tabId) {
+    browser.tabs.sendMessage(tabId, isEnabled ? "start" : "stop").catch(() => { });
+}
+
+browser.tabs.onActivated.addListener((info) => {
+    notifyTab(info.tabId);
+});
+
+browser.runtime.onMessage.addListener((message, sender) => {
+    if (message === "newTab") {
+        notifyTab(sender.tab.id);
+    }
 });
