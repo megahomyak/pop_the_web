@@ -19,20 +19,18 @@ if (browser.action === undefined) {
 
 let isEnabled = false;
 
-browserAction.onClicked.addListener(() => {
+function notifyTab(tabId) {
+    browser.tabs.sendMessage(tabId, isEnabled ? "start" : "stop").catch(() => { });
+}
+
+browserAction.onClicked.addListener((tab) => {
     isEnabled = !isEnabled;
 
     const iconPath = isEnabled ? "pin_128_128.png" : "pin_128_128_crossed.png";
 
     browserAction.setIcon({ path: iconPath });
-});
 
-function notifyTab(tabId) {
-    browser.tabs.sendMessage(tabId, isEnabled ? "start" : "stop").catch(() => { });
-}
-
-browser.tabs.onActivated.addListener((info) => {
-    notifyTab(info.tabId);
+    notifyTab(tab.id);
 });
 
 browser.runtime.onMessage.addListener((message, sender) => {

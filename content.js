@@ -8,8 +8,6 @@
         ).arrayBuffer()
     );
 
-    browser.tabs.sendMessage("newTab").catch(() => { });
-
     function handleClick(event) {
         const audioBufferSource = audioContext.createBufferSource();
         audioBufferSource.buffer = popAudioBuffer;
@@ -20,11 +18,13 @@
     }
 
     browser.runtime.onMessage.addListener((message) => {
-        if (message.type === "stop" || message.type === "start") {
+        if (message === "stop" || message === "start") {
             document.removeEventListener("click", handleClick, { capture: true });
         }
-        if (message.type === "start") {
+        if (message === "start") {
             document.addEventListener("click", handleClick, { capture: true });
         }
     });
+
+    browser.runtime.sendMessage("newTab").catch(() => { });
 })();
