@@ -1,9 +1,21 @@
-if (browser.action === undefined) {
-    // Manifest V2
-    var browserAction = browser.browserAction;
-} else {
-    // Manifest V3
+if (browser === undefined) {
+    // Chrome, manifest v3
+    var browser = chrome;
     var browserAction = browser.action;
+    browser.tabs.query({}).then((tabs) => {
+        for (const tab of tabs) {
+            browser.scripting.executeScript({
+                target: {
+                    tabId: tab.id,
+                    allFrames: true,
+                },
+                files: ["content.js"]
+            }).catch(() => {});
+        }
+    });
+} else {
+    // Firefox, manifest v2
+    var browserAction = browser.browserAction;
 }
 
 let isEnabled = false;
@@ -17,7 +29,7 @@ browserAction.onClicked.addListener(() => {
 
     browser.tabs.query({}).then((tabs) => {
         for (const tab of tabs) {
-            browser.tabs.sendMessage(tab.id, { type: "setIsEnabled", value: isEnabled });
+            browser.tabs.sendMessage(tab.id, { type: "setIsEnabled", value: isEnabled }).catch(() => {});
         }
     });
 });

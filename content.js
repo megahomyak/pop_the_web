@@ -1,4 +1,7 @@
 (async () => {
+    if (browser === undefined) {
+        var browser = chrome;
+    }
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioContext = new AudioContext();
 
@@ -10,10 +13,14 @@
 
     let isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
 
+    function stopEverything(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    }
+
     document.addEventListener("pointerdown", (event) => {
         if (isEnabled) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
+            stopEverything(event);
             if (event.target.remove !== undefined) {
                 const audioBufferSource = audioContext.createBufferSource();
                 audioBufferSource.buffer = popAudioBuffer;
@@ -23,6 +30,17 @@
             }
         }
     }, { capture: true });
+    `
+    pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
+    auxclick click contextmenu dblclick DOMActivate DOMMouseScroll mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup mousewheel MozMousePixelScroll webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
+    gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
+    `.split(/\s+/).forEach((eventName) => {
+        document.addEventListener(eventName, (event) => {
+            if (isEnabled) {
+                stopEverything(event);
+            }
+        }, { capture: true });
+    });
 
     browser.runtime.onMessage.addListener((message) => {
         if (message.type === "setIsEnabled") {
