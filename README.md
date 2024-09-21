@@ -10,7 +10,7 @@ The demo is also in this repository, file `demo.mp4`
 
 # Installation
 
-* You'd need `chrome.zip` or `firefox.zip`. Either `make` them or download them from a [GitHub release of this extension](https://github.com/megahomyak/pop_the_web/releases/latest)
+* You'd need `chrome.zip` or `firefox.zip`. Either `make` them (but don't forget to `git switch --detach` to the latest version tag first!) or download them from a [GitHub release of this extension](https://github.com/megahomyak/pop_the_web/releases/latest)
 * Read up on how to install custom extensions into your browser and install the extension from the corresponding `.zip` file (for Chrome you'll need to unpack it first)
 
 # Troubleshooting
