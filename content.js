@@ -13,33 +13,31 @@
 
     let isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
 
-    function stopEverything(event) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-    }
+    let lastPointerPosition = null;
 
-    ["click", "touchstart"].forEach(eventName => {
-        document.addEventListener(eventName, event => {
-            if (isEnabled) {
-                stopEverything(event);
-                if (event.target.remove !== undefined) {
-                    const audioBufferSource = audioContext.createBufferSource();
-                    audioBufferSource.buffer = popAudioBuffer;
-                    audioBufferSource.connect(audioContext.destination);
-                    audioBufferSource.start();
-                    event.target.remove();
-                }
-            }
-        }, { capture: true });
-    });
+    const clickDistance = 20;
+
     `
     pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
     auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
     gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
     `.split(/\s+/).forEach(eventName => {
         document.addEventListener(eventName, event => {
+            console.log(eventName);
             if (isEnabled) {
-                stopEverything(event);
+                if (eventName === "pointerdown") {
+                    lastPointerPosition = [event.screenX, event.screenY];
+                } else if (eventName === "pointerup") {
+                    if ((lastPointerPosition[0] - event.screenX) <= clickDistance && (lastPointerPosition[1] - event.screenY) <= clickDistance && event.target.remove !== undefined) {
+                        const audioBufferSource = audioContext.createBufferSource();
+                        audioBufferSource.buffer = popAudioBuffer;
+                        audioBufferSource.connect(audioContext.destination);
+                        audioBufferSource.start();
+                        event.target.remove();
+                    }
+                }
+                event.preventDefault();
+                event.stopImmediatePropagation();
             }
         }, { capture: true });
     });

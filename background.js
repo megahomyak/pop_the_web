@@ -2,7 +2,7 @@ if (browser === undefined) {
     // Chrome, manifest v3
     var browser = chrome;
     var browserAction = browser.action;
-    browser.tabs.query({}).then((tabs) => {
+    browser.tabs.query({}).then(tabs => {
         for (const tab of tabs) {
             browser.scripting.executeScript({
                 target: {
@@ -27,7 +27,7 @@ browserAction.onClicked.addListener(() => {
 
     browserAction.setIcon({ path: iconPath });
 
-    browser.tabs.query({}).then((tabs) => {
+    browser.tabs.query({}).then(tabs => {
         for (const tab of tabs) {
             browser.tabs.sendMessage(tab.id, { type: "setIsEnabled", value: isEnabled }).catch(() => {});
         }
