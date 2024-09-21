@@ -18,31 +18,33 @@
         event.stopImmediatePropagation();
     }
 
-    document.addEventListener("click", (event) => {
-        if (isEnabled) {
-            stopEverything(event);
-            if (event.target.remove !== undefined) {
-                const audioBufferSource = audioContext.createBufferSource();
-                audioBufferSource.buffer = popAudioBuffer;
-                audioBufferSource.connect(audioContext.destination);
-                audioBufferSource.start();
-                event.target.remove();
+    ["click", "touchstart"].forEach(eventName => {
+        document.addEventListener(eventName, event => {
+            if (isEnabled) {
+                stopEverything(event);
+                if (event.target.remove !== undefined) {
+                    const audioBufferSource = audioContext.createBufferSource();
+                    audioBufferSource.buffer = popAudioBuffer;
+                    audioBufferSource.connect(audioContext.destination);
+                    audioBufferSource.start();
+                    event.target.remove();
+                }
             }
-        }
-    }, { capture: true });
+        }, { capture: true });
+    });
     `
     pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
     auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
     gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
-    `.split(/\s+/).forEach((eventName) => {
-        document.addEventListener(eventName, (event) => {
+    `.split(/\s+/).forEach(eventName => {
+        document.addEventListener(eventName, event => {
             if (isEnabled) {
                 stopEverything(event);
             }
         }, { capture: true });
     });
 
-    browser.runtime.onMessage.addListener((message) => {
+    browser.runtime.onMessage.addListener(message => {
         if (message.type === "setIsEnabled") {
             isEnabled = message.value;
         }
