@@ -32,7 +32,7 @@
     }, { capture: true });
     `
     pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
-    auxclick click contextmenu dblclick DOMActivate DOMMouseScroll mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup mousewheel MozMousePixelScroll webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
+    auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
     gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
     `.split(/\s+/).forEach((eventName) => {
         document.addEventListener(eventName, (event) => {
