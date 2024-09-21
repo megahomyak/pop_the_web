@@ -18,7 +18,7 @@
         event.stopImmediatePropagation();
     }
 
-    document.addEventListener("pointerdown", (event) => {
+    document.addEventListener("click", (event) => {
         if (isEnabled) {
             stopEverything(event);
             if (event.target.remove !== undefined) {
@@ -30,8 +30,11 @@
             }
         }
     }, { capture: true });
-    Object.keys(window).filter(key => /^on/.test(key)).map(key => key.substring(2)).forEach((eventName) => {
-        console.log(eventName);
+    `
+    pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
+    auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
+    gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
+    `.split(/\s+/).forEach((eventName) => {
         document.addEventListener(eventName, (event) => {
             if (isEnabled) {
                 stopEverything(event);
