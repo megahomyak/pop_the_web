@@ -7,6 +7,9 @@
             "128": "pin_128_128_crossed.png"
         }
     },
+    "icons": {
+        "128": "pin_128_128.png"
+    },
     "background": {
         "service_worker": "background.js"
     },

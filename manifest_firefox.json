@@ -5,6 +5,9 @@
     "browser_action": {
         "default_icon": "pin_128_128_crossed.png"
     },
+    "icons": {
+        "128": "pin_128_128.png"
+    },
     "background": {
         "scripts": ["background.js"]
     },
