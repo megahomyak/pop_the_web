@@ -3,6 +3,7 @@
         var browser = chrome;
     }
     const pop = new Audio(browser.runtime.getURL('pop.mp3'));
+    pop.load();
 
     let extension = {
         _isEnabled: null,
