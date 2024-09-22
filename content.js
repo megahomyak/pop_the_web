@@ -15,16 +15,16 @@
     let selectedElement = null;
 
     function handlePointerEvent(event) {
-        console.log(event.type);
         if (!isEnabled) {
             return;
         }
         if (event.type === "pointerup") {
-            if (selectedElement.remove !== undefined) {
+            if (selectedElement !== document.documentElement) {
                 const audioBufferSource = audioContext.createBufferSource();
                 audioBufferSource.buffer = popAudioBuffer;
                 audioBufferSource.connect(audioContext.destination);
                 audioBufferSource.start();
+                console.log(selectedElement);
                 selectedElement.remove();
             }
         } else if (event.type === "pointerdown") {
