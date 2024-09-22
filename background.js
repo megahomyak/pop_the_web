@@ -18,24 +18,34 @@ if (browser === undefined) {
     var browserAction = browser.browserAction;
 }
 
-let isEnabled = false;
+let extension = {
+    _isEnabled: false,
+    get isEnabled() {
+        return this._isEnabled;
+    },
+    set isEnabled(newIsEnabled) {
+        this._isEnabled = newIsEnabled;
+        const iconPath = this._isEnabled ? "pin_128_128.png" : "pin_128_128_crossed.png";
+        browserAction.setIcon({ path: iconPath });
+        browser.tabs.query({}).then(tabs => {
+            for (const tab of tabs) {
+                browser.tabs.sendMessage(tab.id, { type: "setIsEnabled", value: this._isEnabled }).catch(() => {});
+            }
+        });
+    }
+};
 
 browserAction.onClicked.addListener(() => {
-    isEnabled = !isEnabled;
-
-    const iconPath = isEnabled ? "pin_128_128.png" : "pin_128_128_crossed.png";
-
-    browserAction.setIcon({ path: iconPath });
-
-    browser.tabs.query({}).then(tabs => {
-        for (const tab of tabs) {
-            browser.tabs.sendMessage(tab.id, { type: "setIsEnabled", value: isEnabled }).catch(() => {});
-        }
-    });
+    extension.isEnabled = !extension.isEnabled;
 });
 
 browser.runtime.onMessage.addListener((message, _sender, respond) => {
     if (message.type === "getIsEnabled") {
-        respond(isEnabled);
+        respond(extension.isEnabled);
     }
+});
+
+window.addEventListener("beforeunload", () => {
+    console.log("blah");
+    extension.isEnabled = false;
 });
