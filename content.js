@@ -2,8 +2,13 @@
     if (browser === undefined) {
         var browser = chrome;
     }
-    const pop = new Audio(browser.runtime.getURL('pop.mp3'));
-    pop.load();
+    const AudioContext = window.AudioContext//|| window.webkitAudioContext;
+    const audioContext = new AudioContext();
+    const popAudioBuffer = await audioContext.decodeAudioData(
+        await (
+            await fetch(browser.runtime.getURL('pop.mp3'))
+        ).arrayBuffer()
+    );
 
     let selectedElements = new Map();
     let extension = {
@@ -31,15 +36,16 @@
         event.preventDefault();
         event.stopImmediatePropagation();
         if (event.type === "pointerup") {
-            let selectedElement = selectedElements.get(event.pointerId);
+            const selectedElement = selectedElements.get(event.pointerId);
             selectedElements.delete(event.pointerId);
             if (selectedElement !== document.documentElement) {
-                let popClone = pop.cloneNode();
-                popClone.play();
-                popClone.addEventListener("ended", () => {
-                    popClone.remove();
-                }, { once: true });
                 selectedElement.remove();
+                audioContext.resume().then(() => {
+                    const audioBufferSource = audioContext.createBufferSource();
+                    audioBufferSource.buffer = popAudioBuffer;
+                    audioBufferSource.connect(audioContext.destination);
+                    audioBufferSource.start();
+                });
             }
         } else if (event.type === "pointercancel") {
             selectedElements.delete(event.pointerId);
