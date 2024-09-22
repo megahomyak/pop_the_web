@@ -12,25 +12,23 @@
     );
 
     let isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
-    let scrollingOccured = false;
+    let selectedElement = null;
 
-    function handleEvent(event) {
+    function handlePointerEvent(event) {
         console.log(event.type);
         if (!isEnabled) {
             return;
         }
         if (event.type === "pointerup") {
-            if (!scrollingOccured && event.target.remove !== undefined) {
+            if (selectedElement !== null && selectedElement.remove !== undefined) {
                 const audioBufferSource = audioContext.createBufferSource();
                 audioBufferSource.buffer = popAudioBuffer;
                 audioBufferSource.connect(audioContext.destination);
                 audioBufferSource.start();
-                event.target.remove();
+                selectedElement.remove();
             }
         } else if (event.type === "pointerdown") {
-            scrollingOccured = false;
-        } else if (event.type === "scroll") {
-            scrollingOccured = true;
+            selectedElement = event.target;
         }
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -40,9 +38,12 @@
     pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
     auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
     gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
-    scroll
     `.split(/\s+/).forEach(eventName => {
-        document.addEventListener(eventName, handleEvent, { capture: true });
+        document.addEventListener(eventName, handlePointerEvent, { capture: true });
+    });
+
+    document.addEventListener("scroll", () => {
+        selectedElement = null;
     });
 
     browser.runtime.onMessage.addListener(message => {
