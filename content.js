@@ -11,10 +11,32 @@
         ).arrayBuffer()
     );
 
-    let isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
+    class IsEnabled {
+        #value;
+        #oldTouchAction = null;
+        constructor(initialValue) {
+            this.#value = initialValue;
+        }
+        set(newValue) {
+            this.#value = newValue;
+            if (this.#value) {
+                this.#oldTouchAction = document.documentElement.style["touch-action"];
+                document.documentElement.style["touch-action"] = "none";
+            } else {
+                document.documentElement.style["touch-action"] = this.#oldTouchAction;
+            }
+        }
+        get() {
+            return this.#value;
+        }
+    }
+    let isEnabled = new IsEnabled(await browser.runtime.sendMessage({ type: "getIsEnabled" }));
 
     function handleEvent(event) {
-        console.log(event, document.documentElement.style.touchAction);
+        if (!isEnabled.get()) {
+            return;
+        }
+        console.log(event.type, document.documentElement.style.touchAction);
         if (event.type === "click" && event.target.remove !== undefined) {
             const audioBufferSource = audioContext.createBufferSource();
             audioBufferSource.buffer = popAudioBuffer;
@@ -23,40 +45,21 @@
             event.target.remove();
         }
         if (event.type !== "pointerdown") {
-            event.preventDefault();
         }
         event.stopImmediatePropagation();
     }
-    function getHandlerAdditionArguments(eventName) {
-        return [eventName, handleEvent, { capture: true }];
-    }
 
-    let oldTouchAction = null;
-    function updatePopping() {
-        if (false) {
-            oldTouchAction = document.documentElement.style.touchAction;
-            document.documentElement.style.touchAction = "manipulation";
-        } else {
-            document.documentElement.style.touchAction = oldTouchAction;
-        }
-        `
-        pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
-        auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
-        gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
-        `.split(/\s+/).forEach(eventName => {
-            document.removeEventListener(...getHandlerAdditionArguments(eventName));
-            if (isEnabled) {
-                document.addEventListener(...getHandlerAdditionArguments(eventName));
-            }
-        });
-    }
-
-    updatePopping();
+    `
+    pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
+    auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
+    gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
+    `.split(/\s+/).forEach(eventName => {
+        document.addEventListener(eventName, handleEvent, { capture: true });
+    });
 
     browser.runtime.onMessage.addListener(message => {
         if (message.type === "setIsEnabled") {
-            isEnabled = message.value;
-            updatePopping();
+            isEnabled.set(message.value);
         }
     });
 })();
