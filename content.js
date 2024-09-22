@@ -5,6 +5,7 @@
     const pop = new Audio(browser.runtime.getURL('pop.mp3'));
     pop.load();
 
+    let selectedElements = new Map();
     let extension = {
         _isEnabled: null,
         _oldDocumentElementStyle: null,
@@ -16,12 +17,12 @@
                 document.documentElement.style["touch-action"] = "manipulation";
                 document.documentElement.style.height = "100%";
             } else if (this._oldDocumentElementStyle !== null) {
+                selectedElements.clear();
                 document.documentElement.style = this._oldDocumentElementStyle;
             }
         }
     };
     extension.isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
-    let selectedElements = new Map();
 
     function handlePointerEvent(event) {
         if (!extension.isEnabled) {
