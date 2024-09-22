@@ -7,15 +7,16 @@
 
     let extension = {
         _isEnabled: null,
-        _oldTouchAction: null,
+        _oldDocumentElementStyle: null,
         get isEnabled() { return this._isEnabled; },
         set isEnabled(newIsEnabled) {
             this._isEnabled = newIsEnabled;
             if (this._isEnabled) {
-                this._oldTouchAction = document.documentElement.style["touch-action"];
+                this._oldDocumentElementStyle = document.documentElement.style;
                 document.documentElement.style["touch-action"] = "manipulation";
-            } else {
-                document.documentElement.style["touch-action"] = this._oldTouchAction;
+                document.documentElement.style.height = "100%";
+            } else if (this._oldDocumentElementStyle !== null) {
+                document.documentElement.style = this._oldDocumentElementStyle;
             }
         }
     };
