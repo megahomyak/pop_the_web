@@ -12,26 +12,19 @@
     );
 
     let isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
-    let scrollingOccured = false;
 
     function handleEvent(event) {
         if (!isEnabled) {
             return;
         }
-        event.target.style["touch-action"] = "manipulation";
-        console.log(event.type, document.documentElement.style.touchAction);
-        if (event.type === "click" && event.target.remove !== undefined) {
+        if (event.type === "pointerup" && event.target.remove !== undefined) {
             const audioBufferSource = audioContext.createBufferSource();
             audioBufferSource.buffer = popAudioBuffer;
             audioBufferSource.connect(audioContext.destination);
             audioBufferSource.start();
             event.target.remove();
         }
-        if (event.type === "pointerdown") {
-        }
-        if (event.type === "scroll") {
-            scrollingOccured = true;
-        }
+        event.preventDefault();
         event.stopImmediatePropagation();
     }
 
