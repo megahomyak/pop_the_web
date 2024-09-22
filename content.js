@@ -20,7 +20,7 @@
             return;
         }
         if (event.type === "pointerup") {
-            if (selectedElement !== null && selectedElement.remove !== undefined) {
+            if (selectedElement.remove !== undefined) {
                 const audioBufferSource = audioContext.createBufferSource();
                 audioBufferSource.buffer = popAudioBuffer;
                 audioBufferSource.connect(audioContext.destination);
@@ -40,10 +40,6 @@
     gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
     `.split(/\s+/).forEach(eventName => {
         document.addEventListener(eventName, handlePointerEvent, { capture: true });
-    });
-
-    document.addEventListener("scroll", () => {
-        selectedElement = null;
     });
 
     browser.runtime.onMessage.addListener(message => {
