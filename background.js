@@ -19,7 +19,7 @@ if (browser === undefined) {
 }
 
 let extension = {
-    _isEnabled: false,
+    _isEnabled: null,
     get isEnabled() {
         return this._isEnabled;
     },
@@ -34,6 +34,7 @@ let extension = {
         });
     }
 };
+extension.isEnabled = false;
 
 browserAction.onClicked.addListener(() => {
     extension.isEnabled = !extension.isEnabled;
@@ -43,9 +44,4 @@ browser.runtime.onMessage.addListener((message, _sender, respond) => {
     if (message.type === "getIsEnabled") {
         respond(extension.isEnabled);
     }
-});
-
-window.addEventListener("beforeunload", () => {
-    console.log("blah");
-    extension.isEnabled = false;
 });

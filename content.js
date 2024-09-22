@@ -12,7 +12,7 @@
     );
 
     let extension = {
-        _isEnabled: await browser.runtime.sendMessage({ type: "getIsEnabled" }),
+        _isEnabled: null,
         _oldTouchAction: null,
         get isEnabled() { return this._isEnabled; },
         set isEnabled(newIsEnabled) {
@@ -25,20 +25,19 @@
             }
         }
     };
+    extension.isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
     let selectedElement = null;
 
     function handlePointerEvent(event) {
         if (!extension.isEnabled) {
             return;
         }
-        console.log(event);
         if (event.type === "pointerup") {
             if (selectedElement !== document.documentElement) {
                 const audioBufferSource = audioContext.createBufferSource();
                 audioBufferSource.buffer = popAudioBuffer;
                 audioBufferSource.connect(audioContext.destination);
                 audioBufferSource.start();
-                console.log(selectedElement);
                 selectedElement.remove();
             }
         } else if (event.type === "pointerdown") {
