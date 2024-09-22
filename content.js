@@ -3,6 +3,7 @@
         var browser = chrome;
     }
     const pop = new Audio(browser.runtime.getURL('pop.mp3'));
+    pop.autoplay = true;
     pop.load();
 
     let extension = {
@@ -29,6 +30,7 @@
         event.preventDefault();
         event.stopImmediatePropagation();
         if (event.type === "pointerup") {
+            console.log(event);
             if (selectedElement !== document.documentElement) {
                 let popClone = pop.cloneNode();
                 popClone.play();
