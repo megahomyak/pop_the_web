@@ -21,7 +21,7 @@
         }
     };
     extension.isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
-    let selectedElement = null;
+    let selectedElements = new Map();
 
     function handlePointerEvent(event) {
         if (!extension.isEnabled) {
@@ -30,6 +30,7 @@
         event.preventDefault();
         event.stopImmediatePropagation();
         if (event.type === "pointerup") {
+            let selectedElement = selectedElements.get(event.pointerId);
             if (selectedElement !== document.documentElement) {
                 let popClone = pop.cloneNode();
                 popClone.play();
@@ -38,9 +39,11 @@
                 }, { once: true });
                 selectedElement.remove();
             }
+        } else if (event.type === "pointercancel") {
+            selectedElements.delete(event.pointerId);
         } else if (event.type === "pointerdown") {
             event.target.style["touch-action"] = "manipulation";
-            selectedElement = event.target;
+            selectedElements.set(event.pointerId, event.target);
         }
     }
 
