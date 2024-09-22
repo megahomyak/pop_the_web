@@ -32,6 +32,7 @@
         event.stopImmediatePropagation();
         if (event.type === "pointerup") {
             let selectedElement = selectedElements.get(event.pointerId);
+            selectedElements.delete(event.pointerId);
             if (selectedElement !== document.documentElement) {
                 let popClone = pop.cloneNode();
                 popClone.play();
