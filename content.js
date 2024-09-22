@@ -11,31 +11,14 @@
         ).arrayBuffer()
     );
 
-    class IsEnabled {
-        #value;
-        #oldTouchAction = null;
-        constructor(initialValue) {
-            this.#value = initialValue;
-        }
-        set(newValue) {
-            this.#value = newValue;
-            if (this.#value) {
-                this.#oldTouchAction = document.documentElement.style["touch-action"];
-                document.documentElement.style["touch-action"] = "none";
-            } else {
-                document.documentElement.style["touch-action"] = this.#oldTouchAction;
-            }
-        }
-        get() {
-            return this.#value;
-        }
-    }
-    let isEnabled = new IsEnabled(await browser.runtime.sendMessage({ type: "getIsEnabled" }));
+    let isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
+    let scrollingOccured = false;
 
     function handleEvent(event) {
-        if (!isEnabled.get()) {
+        if (!isEnabled) {
             return;
         }
+        event.target.style["touch-action"] = "manipulation";
         console.log(event.type, document.documentElement.style.touchAction);
         if (event.type === "click" && event.target.remove !== undefined) {
             const audioBufferSource = audioContext.createBufferSource();
@@ -44,7 +27,10 @@
             audioBufferSource.start();
             event.target.remove();
         }
-        if (event.type !== "pointerdown") {
+        if (event.type === "pointerdown") {
+        }
+        if (event.type === "scroll") {
+            scrollingOccured = true;
         }
         event.stopImmediatePropagation();
     }
@@ -59,7 +45,7 @@
 
     browser.runtime.onMessage.addListener(message => {
         if (message.type === "setIsEnabled") {
-            isEnabled.set(message.value);
+            isEnabled = message.value;
         }
     });
 })();
