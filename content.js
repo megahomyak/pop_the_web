@@ -34,7 +34,7 @@
                 popClone.play();
                 popClone.addEventListener("ended", () => {
                     popClone.remove();
-                });
+                }, { once: true });
                 selectedElement.remove();
             }
         } else if (event.type === "pointerdown") {
