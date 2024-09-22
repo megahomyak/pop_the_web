@@ -13,38 +13,50 @@
 
     let isEnabled = await browser.runtime.sendMessage({ type: "getIsEnabled" });
 
-    let lastPointerPosition = null;
+    function handleEvent(event) {
+        console.log(event, document.documentElement.style.touchAction);
+        if (event.type === "click" && event.target.remove !== undefined) {
+            const audioBufferSource = audioContext.createBufferSource();
+            audioBufferSource.buffer = popAudioBuffer;
+            audioBufferSource.connect(audioContext.destination);
+            audioBufferSource.start();
+            event.target.remove();
+        }
+        if (event.type !== "pointerdown") {
+            event.preventDefault();
+        }
+        event.stopImmediatePropagation();
+    }
+    function getHandlerAdditionArguments(eventName) {
+        return [eventName, handleEvent, { capture: true }];
+    }
 
-    const clickDistance = 20;
-
-    `
-    pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
-    auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
-    gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
-    `.split(/\s+/).forEach(eventName => {
-        document.addEventListener(eventName, event => {
-            console.log(eventName);
+    let oldTouchAction = null;
+    function updatePopping() {
+        if (false) {
+            oldTouchAction = document.documentElement.style.touchAction;
+            document.documentElement.style.touchAction = "manipulation";
+        } else {
+            document.documentElement.style.touchAction = oldTouchAction;
+        }
+        `
+        pointerover pointerenter pointerdown pointermove pointerup pointercancel pointerout pointerleave pointerrawupdate gotpointercapture lostpointercapture
+        auxclick click contextmenu dblclick DOMActivate mousedown mouseenter mouseleave mousemove mouseout mouseover mouseup webkitmouseforcechanged webkitmouseforcedown webkitmouseforcewillbegin webkitmouseforceup
+        gesturechange gestureend gesturestart touchcancel touchend touchmove touchstart
+        `.split(/\s+/).forEach(eventName => {
+            document.removeEventListener(...getHandlerAdditionArguments(eventName));
             if (isEnabled) {
-                if (eventName === "pointerdown") {
-                    lastPointerPosition = [event.screenX, event.screenY];
-                } else if (eventName === "pointerup") {
-                    if ((lastPointerPosition[0] - event.screenX) <= clickDistance && (lastPointerPosition[1] - event.screenY) <= clickDistance && event.target.remove !== undefined) {
-                        const audioBufferSource = audioContext.createBufferSource();
-                        audioBufferSource.buffer = popAudioBuffer;
-                        audioBufferSource.connect(audioContext.destination);
-                        audioBufferSource.start();
-                        event.target.remove();
-                    }
-                }
-                event.preventDefault();
-                event.stopImmediatePropagation();
+                document.addEventListener(...getHandlerAdditionArguments(eventName));
             }
-        }, { capture: true });
-    });
+        });
+    }
+
+    updatePopping();
 
     browser.runtime.onMessage.addListener(message => {
         if (message.type === "setIsEnabled") {
             isEnabled = message.value;
+            updatePopping();
         }
     });
 })();
