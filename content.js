@@ -30,7 +30,6 @@
         event.preventDefault();
         event.stopImmediatePropagation();
         if (event.type === "pointerup") {
-            console.log(event);
             if (selectedElement !== document.documentElement) {
                 let popClone = pop.cloneNode();
                 popClone.play();
